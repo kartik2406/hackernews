@@ -21,42 +21,65 @@ const TECH_LIST = [
   }
 ];
 
-const isSearched = searchText => item => item.title.toLowerCase().includes(searchText.toLowerCase())
+const isSearched = searchText => item =>
+  item.title.toLowerCase().includes(searchText.toLowerCase());
 
 class App extends Component {
-  constructor(props){
+  constructor(props) {
     super(props);
-    console.log(this.props)
+    console.log(this.props);
     this.state = {
       list: TECH_LIST,
-      searchText: ''
-    }
+      searchText: ""
+    };
 
     this.onDismiss = this.onDismiss.bind(this);
     this.onSearchChange = this.onSearchChange.bind(this);
   }
-  onDismiss(id){
+  onDismiss(id) {
     let isNotId = item => item.objectID != id;
     let updatedList = this.state.list.filter(isNotId);
     this.setState({
       list: updatedList
-    })
-
+    });
   }
-  onSearchChange(event){
+  onSearchChange(event) {
     this.setState({
       searchText: event.target.value
-    })
+    });
   }
   render() {
     console.log("hello app");
-    const {list, searchText} = this.state;
+    const { list, searchText } = this.state;
     return (
       <div className="App">
+        <Search value={searchText} onChange={this.onSearchChange}>
+          Search
+        </Search>
+        <Table list={list} pattern={searchText} onDismiss={this.onDismiss} />
+      </div>
+    );
+  }
+}
+
+class Search extends Component {
+  render() {
+    const { value, onChange, children } = this.props;
+    return (
       <form>
-        <input type="text" onChange={this.onSearchChange} value={searchText}/>
+        {children}
+        <input type="text" onChange={onChange} value={value} />
       </form>
-        {list.filter(isSearched(searchText)).map(item => {
+    );
+  }
+}
+
+class Table extends Component {
+  render() {
+    const { list, pattern, onDismiss } = this.props;
+    return (
+      <div>
+        {list.filter(isSearched(pattern)).map(item => {
           return (
             <div key={item.objectID}>
               <span>
@@ -65,7 +88,7 @@ class App extends Component {
               <span>{item.author}</span>
               <span> {item.num_comments} </span>
               <span> {item.points}</span>
-              <button type="button" onClick={ () => this.onDismiss(item.objectID)}>Dismiss</button>
+              <Button onClick={() => onDismiss(item.objectID)}  >Dismiss</Button>
             </div>
           );
         })}
@@ -74,4 +97,14 @@ class App extends Component {
   }
 }
 
+class Button extends Component {
+  render() {
+    const {onClick, className = 'btn', children} = this.props;
+    return (
+      <button type="button" onClick={onClick} className={className}>
+        {children}
+      </button>
+    );
+  }
+}
 export default App;
