@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import logo from "./logo.svg";
 import "./App.css";
 
-const list = [
+const TECH_LIST = [
   {
     title: "React",
     url: "https://facebook.github.io/react/",
@@ -28,7 +28,7 @@ class App extends Component {
     super(props);
     console.log(this.props)
     this.state = {
-      list,
+      list: TECH_LIST,
       searchText: ''
     }
 
@@ -50,13 +50,13 @@ class App extends Component {
   }
   render() {
     console.log("hello app");
-  
+    const {list, searchText} = this.state;
     return (
       <div className="App">
       <form>
         <input type="text" onChange={this.onSearchChange} />
       </form>
-        {this.state.list.filter(isSearched(this.state.searchText)).map(item => {
+        {list.filter(isSearched(searchText)).map(item => {
           return (
             <div key={item.objectID}>
               <span>
