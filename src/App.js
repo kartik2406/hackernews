@@ -54,7 +54,7 @@ class App extends Component {
     return (
       <div className="App">
       <form>
-        <input type="text" onChange={this.onSearchChange} />
+        <input type="text" onChange={this.onSearchChange} value={searchText}/>
       </form>
         {list.filter(isSearched(searchText)).map(item => {
           return (
