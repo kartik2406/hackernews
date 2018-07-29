@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import axios from "axios";
 import "./App.css";
+import PropTypes from "prop-types";
 
 const DEFAULT_QUERY = "redux";
 const DEFAULT_HPP = "100";
@@ -132,12 +133,33 @@ class App extends Component {
   }
 }
 
-const Search = ({ value, onChange, onSubmit, children }) => (
-  <form onSubmit={onSubmit}>
-    <input type="text" onChange={onChange} value={value} />
-    <button type="submit">{children}</button>
-  </form>
-);
+class Search extends Component {
+  render() {
+    const { value, onChange, onSubmit, children } = this.props;
+    return (
+      <form onSubmit={onSubmit}>
+        <input
+          type="text"
+          onChange={onChange}
+          value={value}
+          ref={node => (this.input = node)}
+        />
+        <button type="submit">{children}</button>
+      </form>
+    );
+  }
+  componentDidMount() {
+    if (this.input) {
+      this.input.focus();
+    }
+  }
+}
+Search.propTypes = {
+  value: PropTypes.string.isRequired,
+  onChange: PropTypes.func.isRequired,
+  onSubmit: PropTypes.func.isRequired,
+  children: PropTypes.node.isRequired
+};
 
 const Table = ({ list, pattern, onDismiss }) => (
   <div className="table">
@@ -163,12 +185,29 @@ const Table = ({ list, pattern, onDismiss }) => (
     })}
   </div>
 );
+Table.propTypes = {
+  list: PropTypes.arrayOf(
+    PropTypes.shape({
+      objectID: PropTypes.string.isRequired,
+      author: PropTypes.string,
+      url: PropTypes.string,
+      num_comments: PropTypes.number,
+      points: PropTypes.number
+    })
+  ).isRequired,
+  onDismiss: PropTypes.func.isRequired
+};
 
 const Button = ({ onClick, className = "btn", children }) => (
   <button type="button" onClick={onClick} className={className}>
     {children}
   </button>
 );
+Button.propTypes = {
+  onClick: PropTypes.func.isRequired,
+  className: PropTypes.string,
+  children: PropTypes.node.isRequired
+};
 
 export default App;
 export { Button, Table, Search };
