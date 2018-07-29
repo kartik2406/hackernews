@@ -30,7 +30,8 @@ class App extends Component {
     this.state = {
       results: null,
       searchKey: "",
-      searchTerm: DEFAULT_QUERY
+      searchTerm: DEFAULT_QUERY,
+      error: null
     };
 
     this.setStories = this.setStories.bind(this);
@@ -43,7 +44,7 @@ class App extends Component {
   onSearchSubmit(event) {
     const { searchTerm } = this.state;
     this.setState({ searchKey: searchTerm });
-    if(this.needsToSearchStories){
+    if (this.needsToSearchStories) {
       this.fetchSearchStories(searchTerm);
     }
     event.preventDefault();
@@ -57,7 +58,7 @@ class App extends Component {
     )
       .then(response => response.json())
       .then(result => this.setStories(result))
-      .catch(error => console.log(error));
+      .catch(error => this.setState({ error }));
   }
   setStories(result) {
     const { hits, page } = result;
@@ -91,11 +92,12 @@ class App extends Component {
     });
   }
   render() {
-    const { results, searchTerm, searchKey } = this.state;
+    const { results, searchTerm, searchKey, error } = this.state;
     const page =
       (results && results[searchKey] && results[searchKey].page) || 0;
     const list =
       (results && results[searchKey] && results[searchKey].hits) || [];
+
     return (
       <div className="page">
         <div className="interactions">
@@ -107,8 +109,14 @@ class App extends Component {
             Search
           </Search>
         </div>
+        {error ? (
+          <div className="interactions">
+            <p> Something went wrong</p>
+          </div>
+        ) : (
+          <Table list={list} pattern={searchTerm} onDismiss={this.onDismiss} />
+        )}
 
-        <Table list={list} pattern={searchTerm} onDismiss={this.onDismiss} />
         <div className="interactions">
           <Button onClick={() => this.fetchSearchStories(searchKey, page + 1)}>
             More
