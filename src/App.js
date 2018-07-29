@@ -3,9 +3,13 @@ import logo from "./logo.svg";
 import "./App.css";
 
 const DEFAULT_QUERY = "redux";
+const DEFAULT_HPP = "100";
+
 const PATH_BASE = "https://hn.algolia.com/api/v1";
 const PATH_SEARCH = "/search";
 const PARAM_SEARCH = "query=";
+const PARAM_PAGE = "page=";
+const PARAM_HPP = "hitsPerPage=";
 
 const largeColumn = {
   width: "40%"
@@ -39,14 +43,21 @@ class App extends Component {
     this.fetchSearchStories(searchTerm);
     event.preventDefault();
   }
-  fetchSearchStories(searchTerm) {
-    fetch(`${PATH_BASE}${PATH_SEARCH}?${PARAM_SEARCH}${searchTerm}`)
+  fetchSearchStories(searchTerm, page = 0) {
+    fetch(
+      `${PATH_BASE}${PATH_SEARCH}?${PARAM_SEARCH}${searchTerm}&${PARAM_PAGE}${page}&${PARAM_HPP}${DEFAULT_HPP}`
+    )
       .then(response => response.json())
       .then(result => this.setStories(result))
       .catch(error => console.log(error));
   }
   setStories(result) {
-    this.setState({ result });
+    const { hits, page } = result;
+
+    const oldHits = page ? this.state.result.hits : [];
+
+    const updatedHits = [...oldHits, ...hits];
+    this.setState({ result: { hits: updatedHits, page } });
   }
   componentDidMount() {
     const { searchTerm } = this.state;
@@ -67,10 +78,15 @@ class App extends Component {
   render() {
     console.log("hello app");
     const { result, searchTerm } = this.state;
+    const page = (result && result.page) || 0;
     return (
       <div className="page">
         <div className="interactions">
-          <Search value={searchTerm} onChange={this.onSearchChange} onSubmit={this.onSearchSubmit}>
+          <Search
+            value={searchTerm}
+            onChange={this.onSearchChange}
+            onSubmit={this.onSearchSubmit}
+          >
             Search
           </Search>
         </div>
@@ -81,12 +97,17 @@ class App extends Component {
             onDismiss={this.onDismiss}
           />
         ) : null}
+        <div className="interactions">
+          <Button onClick={() => this.fetchSearchStories(searchTerm, page + 1)}>
+            More
+          </Button>
+        </div>
       </div>
     );
   }
 }
 
-const Search = ({ value, onChange,onSubmit, children }) => (
+const Search = ({ value, onChange, onSubmit, children }) => (
   <form onSubmit={onSubmit}>
     <input type="text" onChange={onChange} value={value} />
     <button type="submit">{children}</button>
