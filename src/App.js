@@ -33,7 +33,8 @@ class App extends Component {
       results: null,
       searchKey: "",
       searchTerm: DEFAULT_QUERY,
-      error: null
+      error: null,
+      isLoading: false
     };
 
     this.setStories = this.setStories.bind(this);
@@ -45,7 +46,7 @@ class App extends Component {
   }
   onSearchSubmit(event) {
     const { searchTerm } = this.state;
-    this.setState({ searchKey: searchTerm });
+    this.setState({ searchKey: searchTerm, loading: true });
     if (this.needsToSearchStories) {
       this.fetchSearchStories(searchTerm);
     }
@@ -55,12 +56,15 @@ class App extends Component {
     return !this.state.results[searchTerm];
   }
   fetchSearchStories(searchTerm, page = 0) {
+    this.setState({isLoading: true});
     axios
       .get(
         `${PATH_BASE}${PATH_SEARCH}?${PARAM_SEARCH}${searchTerm}&${PARAM_PAGE}${page}&${PARAM_HPP}${DEFAULT_HPP}`
       )
       .then(result => this._isMounted && this.setStories(result.data))
-      .catch(error => this._isMounted && this.setState({ error }));
+      .catch(
+        error => this._isMounted && this.setState({ error, loading: false })
+      );
   }
   setStories(result) {
     const { hits, page } = result;
@@ -70,7 +74,8 @@ class App extends Component {
 
     const updatedHits = [...oldHits, ...hits];
     this.setState({
-      results: { ...results, [searchKey]: { hits: updatedHits, page } }
+      results: { ...results, [searchKey]: { hits: updatedHits, page } },
+      isLoading: false
     });
   }
   componentDidMount() {
@@ -95,7 +100,7 @@ class App extends Component {
     });
   }
   render() {
-    const { results, searchTerm, searchKey, error } = this.state;
+    const { results, searchTerm, searchKey, error, isLoading } = this.state;
     const page =
       (results && results[searchKey] && results[searchKey].page) || 0;
     const list =
@@ -121,9 +126,15 @@ class App extends Component {
         )}
 
         <div className="interactions">
-          <Button onClick={() => this.fetchSearchStories(searchKey, page + 1)}>
-            More
-          </Button>
+          {isLoading ? (
+            <Loading />
+          ) : (
+            <Button
+              onClick={() => this.fetchSearchStories(searchKey, page + 1)}
+            >
+              More
+            </Button>
+          )}
         </div>
       </div>
     );
@@ -209,5 +220,6 @@ Button.propTypes = {
   children: PropTypes.node.isRequired
 };
 
+const Loading = () => <div className="loader"> <i className="fas fa-spinner"></i> </div>;
 export default App;
 export { Button, Table, Search };
