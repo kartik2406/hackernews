@@ -56,14 +56,14 @@ class App extends Component {
     return !this.state.results[searchTerm];
   }
   fetchSearchStories(searchTerm, page = 0) {
-    this.setState({isLoading: true});
+    this.setState({ isLoading: true });
     axios
       .get(
         `${PATH_BASE}${PATH_SEARCH}?${PARAM_SEARCH}${searchTerm}&${PARAM_PAGE}${page}&${PARAM_HPP}${DEFAULT_HPP}`
       )
       .then(result => this._isMounted && this.setStories(result.data))
       .catch(
-        error => this._isMounted && this.setState({ error, loading: false })
+        error => this._isMounted && this.setState({ error, isLoading: false })
       );
   }
   setStories(result) {
@@ -117,24 +117,19 @@ class App extends Component {
             Search
           </Search>
         </div>
-        {error ? (
+        <TableWithError
+          error={error}
+          list={list}
+          pattern={searchTerm}
+          onDismiss={this.onDismiss}
+        />
           <div className="interactions">
-            <p> Something went wrong</p>
-          </div>
-        ) : (
-          <Table list={list} pattern={searchTerm} onDismiss={this.onDismiss} />
-        )}
-
-        <div className="interactions">
-          {isLoading ? (
-            <Loading />
-          ) : (
-            <Button
+          <ButtonWithLoading
               onClick={() => this.fetchSearchStories(searchKey, page + 1)}
+            isLoading={isLoading}
             >
               More
-            </Button>
-          )}
+          </ButtonWithLoading>
         </div>
       </div>
     );
@@ -220,6 +215,27 @@ Button.propTypes = {
   children: PropTypes.node.isRequired
 };
 
-const Loading = () => <div className="loader"> <i className="fas fa-spinner"></i> </div>;
+const Loading = () => (
+  <div className="loader">
+    {" "}
+    <i className="fas fa-spinner" />{" "}
+  </div>
+);
+
+const withLoading = Component => ({ isLoading, ...rest }) =>
+  isLoading ? <Loading /> : <Component {...rest} />;
+
+const withError = Component => ({ error, ...rest }) =>
+  error ? (
+    <div className="interactions">
+      <p> Something went wrong</p>
+    </div>
+  ) : (
+    <Component {...rest} />
+  );
+
+const TableWithError = withError(Table);
+
+const ButtonWithLoading = withLoading(Button);
 export default App;
 export { Button, Table, Search };
