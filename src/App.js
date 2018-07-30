@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import axios from "axios";
 import "./App.css";
 import PropTypes from "prop-types";
+import { compose } from "recompose";
 
 const DEFAULT_QUERY = "redux";
 const DEFAULT_HPP = "100";
@@ -70,7 +71,7 @@ class App extends Component {
     const { hits, page } = result;
     const { searchKey, results } = this.state;
 
-    const oldHits = results && results[searchKey] ? results[searchKey] : [];
+    const oldHits = results && results[searchKey] ? results[searchKey].hits : [];
 
     const updatedHits = [...oldHits, ...hits];
     this.setState({
@@ -123,12 +124,12 @@ class App extends Component {
           pattern={searchTerm}
           onDismiss={this.onDismiss}
         />
-          <div className="interactions">
+        <div className="interactions">
           <ButtonWithLoading
-              onClick={() => this.fetchSearchStories(searchKey, page + 1)}
+            onClick={() => this.fetchSearchStories(searchKey, page + 1)}
             isLoading={isLoading}
-            >
-              More
+          >
+            More
           </ButtonWithLoading>
         </div>
       </div>
@@ -217,25 +218,32 @@ Button.propTypes = {
 
 const Loading = () => (
   <div className="loader">
-    {" "}
-    <i className="fas fa-spinner" />{" "}
+    <i className="fas fa-spinner" />
   </div>
 );
 
-const withLoading = Component => ({ isLoading, ...rest }) =>
-  isLoading ? <Loading /> : <Component {...rest} />;
+const ErrorComponent = () => (
+  <div className="interactions">
+    <p> Something went wrong</p>
+  </div>
+);
+const withMaybe = conditionalRenderngFn => Component => props =>
+  conditionalRenderngFn(props) ? null : <Component {...props} />;
 
-const withError = Component => ({ error, ...rest }) =>
-  error ? (
-    <div className="interactions">
-      <p> Something went wrong</p>
-    </div>
-  ) : (
-    <Component {...rest} />
-  );
+const withEither = (
+  conditionalRenderngFn,
+  EitherComponent
+) => Component => props =>
+  conditionalRenderngFn(props) ? <EitherComponent /> : <Component {...props} />;
 
+const isLoadingFn = props => props.isLoading;
+const errorExistsFn = props => props.error;
+
+const withConditionalRendering = compose(withEither(isLoadingFn, Loading));
+
+const withError = compose(withEither(errorExistsFn, ErrorComponent));
 const TableWithError = withError(Table);
 
-const ButtonWithLoading = withLoading(Button);
+const ButtonWithLoading = withConditionalRendering(Button);
 export default App;
 export { Button, Table, Search };
