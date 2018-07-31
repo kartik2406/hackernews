@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import axios from "axios";
 import { sortBy } from "lodash";
-import classNames from 'classnames'
+import classNames from "classnames";
 import "./App.css";
 import PropTypes from "prop-types";
 import { compose } from "recompose";
@@ -19,8 +19,8 @@ const SORTS = {
   NONE: list => list,
   TITLE: list => sortBy(list, "title"),
   AUTHOR: list => sortBy(list, "author"),
-  COMMENTS: list => sortBy(list, "num_comments").reverse(),
-  POINTS: list => sortBy(list, "points").reverse()
+  COMMENTS: list => sortBy(list, "num_comments"),
+  POINTS: list => sortBy(list, "points")
 };
 const largeColumn = {
   width: "40%"
@@ -204,22 +204,42 @@ const Table = ({ list, onDismiss, sortKey, onSort, isSortReverse }) => {
     <div className="table">
       <div className="table-header">
         <span style={{ width: "40%" }}>
-          <Sort sortKey={"TITLE"} activeSortKey={sortKey} onSort={onSort}>
+          <Sort
+            sortKey={"TITLE"}
+            activeSortKey={sortKey}
+            isSortReverse={isSortReverse}
+            onSort={onSort}
+          >
             Title
           </Sort>
         </span>
         <span style={{ width: "30%" }}>
-          <Sort sortKey={"AUTHOR"} activeSortKey={sortKey} onSort={onSort}>
+          <Sort
+            sortKey={"AUTHOR"}
+            activeSortKey={sortKey}
+            isSortReverse={isSortReverse}
+            onSort={onSort}
+          >
             Author
           </Sort>
         </span>
         <span style={{ width: "10%" }}>
-          <Sort sortKey={"COMMENTS"} activeSortKey={sortKey} onSort={onSort}>
+          <Sort
+            sortKey={"COMMENTS"}
+            activeSortKey={sortKey}
+            isSortReverse={isSortReverse}
+            onSort={onSort}
+          >
             Comments
           </Sort>
         </span>
         <span style={{ width: "10%" }}>
-          <Sort sortKey={"POINTS"} activeSortKey={sortKey} onSort={onSort}>
+          <Sort
+            sortKey={"POINTS"}
+            activeSortKey={sortKey}
+            isSortReverse={isSortReverse}
+            onSort={onSort}
+          >
             Points
           </Sort>
         </span>
@@ -278,11 +298,15 @@ const Loading = () => (
   </div>
 );
 
-const Sort = ({ sortKey, onSort, children, activeSortKey }) => {
-  const sortClass = classNames(
-    'button-inline',
-    {'button-active': sortKey == activeSortKey}
-  )
+const Sort = ({ sortKey, onSort, children, activeSortKey, isSortReverse }) => {
+  const sortClass = classNames("button-inline", {
+    "button-active": sortKey == activeSortKey
+  });
+  const iconClass = classNames(
+    "fas",
+    { "fa-arrow-circle-up": !isSortReverse },
+    { "fa-arrow-circle-down": isSortReverse }
+  );
   return (
     <Button
       onClick={() => onSort(sortKey)}
@@ -290,6 +314,7 @@ const Sort = ({ sortKey, onSort, children, activeSortKey }) => {
       className={sortClass}
     >
       {children}
+      {sortKey == activeSortKey ? <i className={iconClass} /> : null}
     </Button>
   );
 };

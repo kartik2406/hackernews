@@ -53,6 +53,11 @@
   outline: none;
   border: none;
 }
+
+.button-inline .fas {
+  margin-left: 10px;
+  color: #38bb6c;
+}
 .button-active {
   border-radius: 0;
   border-bottom: 1px solid #38bb6c;
