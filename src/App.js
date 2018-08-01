@@ -304,8 +304,10 @@ const Sort = ({ sortKey, onSort, children, activeSortKey, isSortReverse }) => {
   });
   const iconClass = classNames(
     "fas",
-    { "fa-arrow-circle-up": !isSortReverse },
-    { "fa-arrow-circle-down": isSortReverse }
+    { "fa-sort": sortKey != activeSortKey },
+    { "active": sortKey == activeSortKey },
+    { "fa-sort-up": sortKey == activeSortKey && !isSortReverse },
+    { "fa-sort-down": sortKey == activeSortKey && isSortReverse }
   );
   return (
     <Button
@@ -314,7 +316,7 @@ const Sort = ({ sortKey, onSort, children, activeSortKey, isSortReverse }) => {
       className={sortClass}
     >
       {children}
-      {sortKey == activeSortKey ? <i className={iconClass} /> : null}
+      <i className={iconClass} />
     </Button>
   );
 };
