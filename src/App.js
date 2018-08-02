@@ -34,6 +34,17 @@ const smallColumn = {
   width: "10%"
 };
 
+const updateSearchStories = (hits, page) => prevState => {
+  const { searchKey, results } = prevState;
+
+  const oldHits = results && results[searchKey] ? results[searchKey].hits : [];
+
+  const updatedHits = [...oldHits, ...hits];
+  return {
+    results: { ...results, [searchKey]: { hits: updatedHits, page } },
+    isLoading: false
+  };
+};
 class App extends Component {
   _isMounted = false;
   constructor(props) {
@@ -78,16 +89,8 @@ class App extends Component {
   }
   setStories(result) {
     const { hits, page } = result;
-    const { searchKey, results } = this.state;
 
-    const oldHits =
-      results && results[searchKey] ? results[searchKey].hits : [];
-
-    const updatedHits = [...oldHits, ...hits];
-    this.setState({
-      results: { ...results, [searchKey]: { hits: updatedHits, page } },
-      isLoading: false
-    });
+    this.setState(updateSearchStories(hits, page));
   }
   componentDidMount() {
     this._isMounted = true;
@@ -136,11 +139,7 @@ class App extends Component {
             Search
           </Search>
         </div>
-        <TableWithError
-          error={error}
-          list={list}
-          onDismiss={this.onDismiss}
-        />
+        <TableWithError error={error} list={list} onDismiss={this.onDismiss} />
         <div className="interactions">
           <ButtonWithLoading
             onClick={() => this.fetchSearchStories(searchKey, page + 1)}
