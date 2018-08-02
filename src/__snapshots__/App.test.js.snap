@@ -41,6 +41,9 @@ exports[`App has a valid snapshot 1`] = `
           type="button"
         >
           Title
+          <i
+            className="fas fa-sort"
+          />
         </button>
       </span>
       <span
@@ -56,6 +59,9 @@ exports[`App has a valid snapshot 1`] = `
           type="button"
         >
           Author
+          <i
+            className="fas fa-sort"
+          />
         </button>
       </span>
       <span
@@ -71,6 +77,9 @@ exports[`App has a valid snapshot 1`] = `
           type="button"
         >
           Comments
+          <i
+            className="fas fa-sort"
+          />
         </button>
       </span>
       <span
@@ -86,6 +95,9 @@ exports[`App has a valid snapshot 1`] = `
           type="button"
         >
           Points
+          <i
+            className="fas fa-sort"
+          />
         </button>
       </span>
       <span
@@ -155,11 +167,14 @@ exports[`Table should have a valid snapshot 1`] = `
       }
     >
       <button
-        className="button-inline button-active"
+        className="button-inline"
         onClick={[Function]}
         type="button"
       >
         Title
+        <i
+          className="fas fa-sort"
+        />
       </button>
     </span>
     <span
@@ -175,6 +190,9 @@ exports[`Table should have a valid snapshot 1`] = `
         type="button"
       >
         Author
+        <i
+          className="fas fa-sort"
+        />
       </button>
     </span>
     <span
@@ -190,6 +208,9 @@ exports[`Table should have a valid snapshot 1`] = `
         type="button"
       >
         Comments
+        <i
+          className="fas fa-sort"
+        />
       </button>
     </span>
     <span
@@ -205,6 +226,9 @@ exports[`Table should have a valid snapshot 1`] = `
         type="button"
       >
         Points
+        <i
+          className="fas fa-sort"
+        />
       </button>
     </span>
     <span

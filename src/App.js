@@ -45,6 +45,17 @@ const updateSearchStories = (hits, page) => prevState => {
     isLoading: false
   };
 };
+
+const filterSearchStories = id => prevState => {
+  let isNotId = item => item.objectID != id;
+  const { results, searchKey } = prevState;
+  const result = results[searchKey];
+
+  let updatedHits = result.hits.filter(isNotId);
+  return {
+    results: { ...results, [searchKey]: { hits: updatedHits } }
+  };
+};
 class App extends Component {
   _isMounted = false;
   constructor(props) {
@@ -99,14 +110,7 @@ class App extends Component {
     this.fetchSearchStories(searchTerm);
   }
   onDismiss(id) {
-    let isNotId = item => item.objectID != id;
-    const { results, searchKey } = this.state;
-    const result = results[searchKey];
-
-    let updatedHits = result.hits.filter(isNotId);
-    this.setState({
-      results: { ...results, [searchKey]: { hits: updatedHits } }
-    });
+    this.setState(filterSearchStories(id));
   }
   onSearchChange(event) {
     this.setState({
